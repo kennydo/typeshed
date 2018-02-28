@@ -3,6 +3,10 @@
 import datetime
 from typing import Optional, List, Set, Dict, Union
 
+from .exceptions import AmbiguousTimeError, InvalidTimeError, NonExistentTimeError, UnknownTimeZoneError
+
+def timezone(str) -> datetime.tzinfo: ...
+
 all_timezones = ...  # type: List
 all_timezones_set = ...  # type: Set
 common_timezones = ...  # type: List
@@ -34,6 +38,19 @@ class _BaseTzInfo(datetime.tzinfo):
 
 class _StaticTzInfo(_BaseTzInfo):
     def normalize(self, dt: datetime.datetime, is_dst: Optional[bool] = ...) -> datetime.datetime: ...
+
+
+class _FixedOffset(datetime.tzinfo):
+    zone = ...  # type: Optional[str]
+
+    def utcoffset(self, dt: datetime.datetime) -> datetime.timedelta: ...
+    def dst(self, dt: datetime.datetime) -> datetime.timedelta: ...
+    def tzname(self, dt: datetime.datetime) -> None: ...
+    def localize(self, dt: datetime.datetime, is_dst: bool = ...) -> datetime.datetime: ...
+    def normalize(self, dt: datetime.datetime, is_dst: bool = ...) -> datetime.datetime: ...
+
+
+def FixedOffset(int, Dict[int, _FixedOffset]) -> _FixedOffset: ...
 
 
 def timezone(zone: str) -> _BaseTzInfo: ...
